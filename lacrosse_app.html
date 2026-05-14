@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>LAX Summer Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0e0e0f;
+  --surface:#18181a;
+  --card:#1f1f22;
+  --border:#2a2a2e;
+  --accent:#c8f54a;
+  --accent2:#4af5c8;
+  --amber:#f5c44a;
+  --coral:#f5604a;
+  --blue:#4a9ff5;
+  --purple:#a44af5;
+  --text:#f0f0ee;
+  --muted:#7a7a80;
+  --sub:#4a4a52;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+.hdr{
+  background:var(--bg);
+  padding:56px 20px 24px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hdr::before{
+  content:'LAX';
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:900;
+  font-size:180px;
+  color:rgba(200,245,74,.04);
+  position:absolute;
+  right:-16px;top:-20px;
+  line-height:1;
+  pointer-events:none;
+  letter-spacing:-4px;
+}
+.hdr-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px}
+.hdr-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:52px;line-height:.95;text-transform:uppercase;letter-spacing:-1px}
+.hdr-title span{color:var(--accent)}
+.hdr-sub{font-size:12px;color:var(--muted);font-weight:300;margin-top:8px}
+.hdr-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pill{font-size:11px;font-weight:500;padding:5px 11px;border-radius:20px;border:1px solid var(--border);color:var(--muted)}
+.pill.hi{border-color:var(--accent);color:var(--accent)}
+
+/* ── PHASE NAV ── */
+.pnav{
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 12px;
+  position:sticky;top:0;z-index:99;
+}
+.pnav::-webkit-scrollbar{display:none}
+.ptab{
+  flex-shrink:0;padding:14px 14px;font-size:12px;font-weight:600;
+  color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px;
+}
+.ptab.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── CONTENT ── */
+.phase{display:none;padding:16px 14px 100px}
+.phase.on{display:block}
+
+/* ── PHASE BANNER ── */
+.pbanner{
+  border-radius:12px;padding:16px 18px;margin-bottom:16px;
+  border:1px solid var(--border);
+  background:linear-gradient(135deg,var(--surface) 0%,var(--card) 100%);
+  position:relative;overflow:hidden;
+}
+.pbanner::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.pbanner.p1::before{background:var(--accent)}
+.pbanner.p2::before{background:var(--amber)}
+.pbanner.p3::before{background:var(--coral)}
+.pbanner.p4::before{background:var(--blue)}
+.pb-phase{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.p1 .pb-phase{color:var(--accent)} .p2 .pb-phase{color:var(--amber)} .p3 .pb-phase{color:var(--coral)} .p4 .pb-phase{color:var(--blue)}
+.pb-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;margin-bottom:6px}
+.pb-desc{font-size:13px;color:var(--muted);line-height:1.55;font-weight:300}
+.pb-desc strong{color:var(--text);font-weight:500}
+
+/* ── PROGRESS ── */
+.prog-block{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;margin-bottom:16px;
+}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.prog-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.prog-pct{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:var(--accent)}
+.prog-dots{display:flex;gap:6px}
+.pd{
+  width:34px;height:34px;border-radius:8px;
+  border:1px solid var(--border);
+  font-size:10px;font-weight:700;color:var(--sub);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;letter-spacing:.3px;
+  text-transform:uppercase;
+}
+.pd.done{background:var(--accent);border-color:var(--accent);color:#0e0e0f}
+.pd.cur{border-color:var(--accent);color:var(--accent)}
+.prog-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+
+/* ── DAY CARD ── */
+.dcard{
+  border:1px solid var(--border);border-radius:14px;
+  background:var(--card);margin-bottom:10px;overflow:hidden;
+}
+.dcard-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;cursor:pointer;
+}
+.dcard-left{display:flex;align-items:center;gap:12px}
+.dday{
+  width:40px;height:40px;border-radius:10px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:.5px;
+}
+.run-day{background:rgba(200,245,74,.12);color:var(--accent)}
+.str-day{background:rgba(245,196,74,.12);color:var(--amber)}
+.tech-day{background:rgba(74,159,245,.12);color:var(--blue)}
+.mob-day{background:rgba(164,74,245,.12);color:var(--purple)}
+.mix-day{background:rgba(245,96,74,.12);color:var(--coral)}
+.rest-day{background:rgba(122,122,128,.12);color:var(--muted)}
+
+.dtitle{font-weight:600;font-size:14px;line-height:1.2}
+.dtype{font-size:11px;color:var(--muted);margin-top:3px;font-weight:300}
+.dmeta{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dur{font-size:12px;color:var(--muted);font-weight:500}
+.chevron{font-size:18px;color:var(--sub);transition:transform .25s;display:inline-block}
+.dcard.open .chevron{transform:rotate(180deg)}
+
+/* ── DAY BODY ── */
+.dbody{display:none;padding:0 16px 16px}
+.dcard.open .dbody{display:block}
+
+.sec-lbl{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--sub);margin:14px 0 8px;font-weight:600;
+}
+.ex{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 0;border-bottom:1px solid var(--border);
+}
+.ex:last-child{border:none}
+.exn{
+  width:24px;height:24px;border-radius:6px;background:var(--surface);
+  font-size:10px;font-weight:700;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.exc{flex:1}
+.exname{font-size:14px;font-weight:500;line-height:1.3}
+.exdet{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;font-weight:300}
+.extag{
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;
+  flex-shrink:0;align-self:flex-start;margin-top:2px;letter-spacing:.3px;
+  text-transform:uppercase;
+}
+.tag-run{background:rgba(200,245,74,.15);color:var(--accent)}
+.tag-str{background:rgba(245,196,74,.15);color:var(--amber)}
+.tag-tech{background:rgba(74,159,245,.15);color:var(--blue)}
+.tag-mob{background:rgba(164,74,245,.15);color:var(--purple)}
+.tag-mix{background:rgba(245,96,74,.15);color:var(--coral)}
+.tag-core{background:rgba(74,245,200,.15);color:var(--accent2)}
+
+.tip{
+  background:rgba(245,196,74,.08);border-left:2px solid var(--amber);
+  border-radius:0 8px 8px 0;padding:10px 12px;
+  font-size:12px;color:var(--amber);line-height:1.5;margin-top:8px;
+}
+.tip strong{font-weight:600}
+
+/* ── STATS SECTION ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px;
+}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;color:var(--accent);line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:300}
+
+/* ── FOCUS LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.lgd{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.lgd-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-label">Piano estate 2025</div>
+  <div class="hdr-title">Summer<br><span>LAX</span><br>Training</div>
+  <div class="hdr-sub">72 kg · 176 cm · 23 anni · 8 settimane</div>
+  <div class="hdr-pills">
+    <span class="pill hi">Fiato ↑</span>
+    <span class="pill hi">Forza ↑</span>
+    <span class="pill">Velocità →</span>
+    <span class="pill">Tecnica →</span>
+    <span class="pill">6 gg/sett</span>
+  </div>
+</div>
+
+<!-- PHASE NAV -->
+<div class="pnav">
+  <div class="ptab on" onclick="showPhase(0)">Fase 1<br><small style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:inherit">Sett 1–2</small></div>
+  <div class="ptab" onclick="showPhase(1)">Fase 2<br><small style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:inherit">Sett 3–4</small></div>
+  <div class="ptab" onclick="showPhase(2)">Fase 3<br><small style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:inherit">Sett 5–6</small></div>
+  <div class="ptab" onclick="showPhase(3)">Fase 4<br><small style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:inherit">Sett 7–8</small></div>
+</div>
+
+<!-- ████ FASE 1 ████ -->
+<div class="phase on" id="ph0">
+  <div class="pbanner p1">
+    <div class="pb-phase">Fase 1 · Settimane 1–2</div>
+    <div class="pb-title">Base &amp; Attivazione</div>
+    <div class="pb-desc">Costruiamo le fondamenta. <strong>Corsa Z2 leggera</strong> per attivare il motore aerobico (il tuo punto critico). <strong>Forza funzionale</strong> da zero con pesi corporei. Prime <strong>sessioni tecnica</strong> domenica. Carichi bassi, esecuzione perfetta.</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">6</div><div class="stat-lbl">giorni/settimana</div></div>
+    <div class="stat-card"><div class="stat-val">~5h</div><div class="stat-lbl">volume settimanale</div></div>
+  </div>
+
+  <div class="legend">
+    <span class="lgd"><span class="lgd-dot" style="background:var(--accent)"></span>Corsa</span>
+    <span class="lgd"><span class="lgd-dot" style="background:var(--amber)"></span>Forza</span>
+    <span class="lgd"><span class="lgd-dot" style="background:var(--blue)"></span>Tecnica</span>
+    <span class="lgd"><span class="lgd-dot" style="background:var(--purple)"></span>Mobilità</span>
+  </div>
+
+  <div class="prog-block">
+    <div class="prog-top">
+      <span class="prog-label">Progressi</span>
+      <span class="prog-pct" id="pct0">0%</span>
+    </div>
+    <div class="prog-dots" id="dots0">
+      <div class="pd cur" onclick="dot(0,0)">Lun</div>
+      <div class="pd" onclick="dot(0,1)">Mar</div>
+      <div class="pd" onclick="dot(0,2)">Mer</div>
+      <div class="pd" onclick="dot(0,3)">Gio</div>
+      <div class="pd" onclick="dot(0,4)">Ven</div>
+      <div class="pd" onclick="dot(0,5)">Sab</div>
+      <div class="pd" onclick="dot(0,6)">Dom</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="fill0" style="width:0%"></div></div>
+  </div>
+
+  <!-- LUN -->
+  <div class="dcard" id="c0-0">
+    <div class="dcard-hdr" onclick="tog('c0-0')">
+      <div class="dcard-left">
+        <div class="dday run-day">Lun</div>
+        <div>
+          <div class="dtitle">Corsa aerobica + Core</div>
+          <div class="dtype">Endurance base · Z2 · 55 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">55'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Riscaldamento — 10'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Camminata veloce + attivazione</div><div class="exdet">5' cammino + 5' skip, corsa calciata, butt kicks, leg swing</div></div></div>
+
+      <div class="sec-lbl">Corsa continua — 30'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Corsa Z2 — ritmo conversazionale</div><div class="exdet">30' senza fermarti. Devi poter parlare a frasi intere. Se rantoli, rallenta a camminata, poi riprendi. La costanza batte la velocità.</div></div><span class="extag tag-run">Z2</span></div>
+      <div class="tip"><strong>Target FC:</strong> 128–140 bpm (65–70% max). Usa un orologio o l'app Salute. Se non hai un cardiofrequenzimetro, il "talk test" è sufficiente.</div>
+
+      <div class="sec-lbl">Core — 15'</div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Plank frontale</div><div class="exdet">3 × 30" · pausa 30" · glutei stretti, lombare neutra</div></div><span class="extag tag-core">Core</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Dead bug</div><div class="exdet">3 × 8 per lato · braccio e gamba opposti, lentissimo. Lombare sempre a terra.</div></div><span class="extag tag-core">Core</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Hollow hold</div><div class="exdet">3 × 20" · gambe e spalle sollevate, corpo a banana</div></div><span class="extag tag-core">Core</span></div>
+    </div>
+  </div>
+
+  <!-- MAR -->
+  <div class="dcard" id="c0-1">
+    <div class="dcard-hdr" onclick="tog('c0-1')">
+      <div class="dcard-left">
+        <div class="dday str-day">Mar</div>
+        <div>
+          <div class="dtitle">Forza upper + Wall ball</div>
+          <div class="dtype">Tiro &amp; passaggio · Parco · 60 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">60'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Riscaldamento — 10'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Rotazioni spalle + chest opener</div><div class="exdet">15 rotazioni avanti/dietro per braccio + 10 aperture toraciche</div></div></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Shadow throwing a specchio</div><div class="exdet">3' · cradle lento + gesto completo del tiro senza pallina</div></div></div>
+
+      <div class="sec-lbl">Forza upper (tiro &amp; passaggio) — 30'</div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Push-up standard</div><div class="exdet">4 × 8 · pausa 60" · scendi lento (3"), spingi esplosivo. Il petto tocca quasi terra.</div></div><span class="extag tag-str">Petto</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">T-Push-up (rotazione)</div><div class="exdet">3 × 6 per lato · push-up + rotazione laterale aprendo il braccio verso il cielo. Rinforza i rotatori del tiro.</div></div><span class="extag tag-str">Rotatori</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Dip su panchina</div><div class="exdet">3 × 10 · gomiti a 90°, schiena vicina alla panca. Tricipiti = spinta finale del tiro.</div></div><span class="extag tag-str">Tricipiti</span></div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Pike push-up</div><div class="exdet">3 × 8 · corpo a V, testa va verso terra. Attiva le spalle per i tiri sovraccapo.</div></div><span class="extag tag-str">Spalle</span></div>
+
+      <div class="sec-lbl">Wall ball + Tecnica tiro — 20'</div>
+      <div class="ex"><div class="exn">7</div><div class="exc"><div class="exname">Passaggi wall ball overhand</div><div class="exdet">2' mano dom + 2' mano non-dom. Distanza 3–4m. Focus: snap del polso al rilascio.</div></div><span class="extag tag-tech">Tecnica</span></div>
+      <div class="ex"><div class="exn">8</div><div class="exc"><div class="exname">Tiro da fermo con step</div><div class="exdet">10 per lato · partenza ferma → passo → tiro. Potenza, non velocità. Osserva il punto di rilascio.</div></div><span class="extag tag-tech">Tiro</span></div>
+    </div>
+  </div>
+
+  <!-- MER -->
+  <div class="dcard" id="c0-2">
+    <div class="dcard-hdr" onclick="tog('c0-2')">
+      <div class="dcard-left">
+        <div class="dday mix-day">Mer</div>
+        <div>
+          <div class="dtitle">Sprint + Agilità + Cambi dir.</div>
+          <div class="dtype">Velocità &amp; esplosività · 55 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">55'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Riscaldamento — 12'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Trot 5' + mobilità dinamica</div><div class="exdet">Leg swing, hip circle, intra-hip stretch camminando</div></div></div>
+
+      <div class="sec-lbl">Sprint — 18'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Sprint 10" – recupero 50"</div><div class="exdet">6 ripetizioni al 90% della massima velocità. Partenza da posizione bassa. Recupero: cammino lento.</div></div><span class="extag tag-run">Sprint</span></div>
+      <div class="tip"><strong>Partenza esplosiva:</strong> Inclinati in avanti 45°, spingi con le dita dei piedi, non partire già in piedi. Sei veloce di natura: sfruttalo con la tecnica giusta.</div>
+
+      <div class="sec-lbl">Agilità &amp; cambi direzione — 25'</div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">5-10-5 shuttle run</div><div class="exdet">6 × · 5m, tocca terra, 10m dall'altra parte, tocca, 5m ritorno. Recupero 45". Usa 3 oggetti come coni.</div></div><span class="extag tag-mix">Agilità</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">T-drill</div><div class="exdet">4 × · coni a forma T (10m × 5m). Avanti, laterale destra, sinistra, indietro. Recupero 60".</div></div><span class="extag tag-mix">Agilità</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Carioca laterale (grapevine)</div><div class="exdet">4 × 15m per lato · passo incrociato alternato. Focus: velocità delle anche, non delle ginocchia.</div></div><span class="extag tag-mix">Coord.</span></div>
+    </div>
+  </div>
+
+  <!-- GIO -->
+  <div class="dcard" id="c0-3">
+    <div class="dcard-hdr" onclick="tog('c0-3')">
+      <div class="dcard-left">
+        <div class="dday str-day">Gio</div>
+        <div>
+          <div class="dtitle">Forza gambe + Pliometria</div>
+          <div class="dtype">Basso corpo · Parco · 60 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">60'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Riscaldamento — 10'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Trot 5' + squat corpo libero × 15 + affondo × 10</div><div class="exdet">Poi hip circle in piedi 10 per lato</div></div></div>
+
+      <div class="sec-lbl">Forza gambe — 30'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Squat a corpo libero</div><div class="exdet">4 × 15 · 3" discesa, 1" pausa in fondo, spinta esplosiva. Piedi larghezza spalle, punte fuori 15°.</div></div><span class="extag tag-str">Quad.</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Affondo bulgaro su panchina</div><div class="exdet">3 × 8 per gamba · piede posteriore sulla panchina. Il ginocchio anteriore NON supera la punta del piede. Fondamentale per lacrosse (mono-appoggio).</div></div><span class="extag tag-str">Glutei</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Ponte glutei con piedi su panchina</div><div class="exdet">3 × 12 · spalle a terra, piedi sulla panca. Spingi i fianchi in alto, pausa 2" in cima.</div></div><span class="extag tag-str">Glutei</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Nordic curl assistito</div><div class="exdet">3 × 5 · piedi bloccati sotto panchina, discesa lentissima (4"). Salva l'ischiocrurali. Previene infortuni ai muscoli posteriori.</div></div><span class="extag tag-str">Ischio</span></div>
+
+      <div class="sec-lbl">Esplosività — 15'</div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Squat jump</div><div class="exdet">4 × 6 · scendi lento (3"), esplodi al massimo in alto. Pausa 90" tra serie. Sett 1–2: max altezza, non frequenza.</div></div><span class="extag tag-run">Potenza</span></div>
+      <div class="ex"><div class="exn">7</div><div class="exc"><div class="exname">Broad jump (salto in lungo)</div><div class="exdet">4 × 4 · salto orizzontale esplosivo, atterraggio morbido su entrambi i piedi. Pausa 90".</div></div><span class="extag tag-run">Potenza</span></div>
+    </div>
+  </div>
+
+  <!-- VEN -->
+  <div class="dcard" id="c0-4">
+    <div class="dcard-hdr" onclick="tog('c0-4')">
+      <div class="dcard-left">
+        <div class="dday run-day">Ven</div>
+        <div>
+          <div class="dtitle">Fartlek + Core rotazionale</div>
+          <div class="dtype">Endurance mista · 55 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">55'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Fartlek — 35'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Fartlek libero (cambia ritmo a landmark)</div><div class="exdet">35' totali: 5' lento → 1' medio-veloce → 5' lento → 1' quasi-sprint → ripeti. Nessun cronometro sulle accelerazioni: accelera su alberi, lampioni, incroci.</div></div><span class="extag tag-run">Misto</span></div>
+      <div class="tip"><strong>Fartlek:</strong> Mima la natura del lacrosse — sprint, recupero, accelerazione. Allena sia il sistema aerobico che lattacido senza devastarti.</div>
+
+      <div class="sec-lbl">Core rotazionale — 15'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Woodchop con pietra/borraccia piena</div><div class="exdet">3 × 12 per lato · diagonale dall'alto-ext verso basso-int. Mimics overhead throw. Usa 1–2kg max.</div></div><span class="extag tag-core">Anti-rot.</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Russian twist</div><div class="exdet">3 × 20 totali · con pietra o borraccia. Piedi sollevati per difficoltà. Simula rotazione del tiro.</div></div><span class="extag tag-core">Obliqui</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Side plank con torsione</div><div class="exdet">3 × 8 per lato · braccio sopra ruota verso il basso sotto il corpo poi risale</div></div><span class="extag tag-core">Obliqui</span></div>
+    </div>
+  </div>
+
+  <!-- SAB -->
+  <div class="dcard" id="c0-5">
+    <div class="dcard-hdr" onclick="tog('c0-5')">
+      <div class="dcard-left">
+        <div class="dday mob-day">Sab</div>
+        <div>
+          <div class="dtitle">Mobilità &amp; Recupero attivo</div>
+          <div class="dtype">Riposo attivo · 40 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">40'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Flusso mobilità completo — 40'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Cat-cow vertebrale</div><div class="exdet">2' continui · respiro sincronizzato. Espira in cat, inspira in cow.</div></div><span class="extag tag-mob">Colonna</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">World's greatest stretch</div><div class="exdet">5 per lato · affondo lungo + mano ipsilaterale a terra + rotazione toracica verso il cielo. Il miglior esercizio per lacrosse.</div></div><span class="extag tag-mob">Full body</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Spiderman lunge + rotazione</div><div class="exdet">8 per lato · affondo profondo con apertura dell'anca + torsione busto</div></div><span class="extag tag-mob">Anche</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Book opener (toracico)</div><div class="exdet">10 per lato · a terra su un fianco, ginocchia flesse, braccio ruota dietro. Mobilità rotatoria per il tiro.</div></div><span class="extag tag-mob">Torace</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Stretching flessori anca (couch stretch)</div><div class="exdet">3 × 45" per lato · ginocchio posteriore a terra, tallone verso gluteo</div></div><span class="extag tag-mob">Anca</span></div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Stretching ischiocrurale seduto</div><div class="exdet">3 × 45" per lato · non rimbalzare, respira nell'allungamento</div></div><span class="extag tag-mob">Ischio</span></div>
+      <div class="ex"><div class="exn">7</div><div class="exc"><div class="exname">Shoulder cross-body stretch</div><div class="exdet">3 × 40" per lato · cuffia dei rotatori. Fondamentale dopo le sessioni di tiro.</div></div><span class="extag tag-mob">Spalla</span></div>
+    </div>
+  </div>
+
+  <!-- DOM -->
+  <div class="dcard" id="c0-6">
+    <div class="dcard-hdr" onclick="tog('c0-6')">
+      <div class="dcard-left">
+        <div class="dday tech-day">Dom</div>
+        <div>
+          <div class="dtitle">Tecnica Lacrosse</div>
+          <div class="dtype">Skills day · Solo domenica · 75 min</div>
+        </div>
+      </div>
+      <div class="dmeta"><span class="dur">75'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Riscaldamento con stick — 15'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Trot con cradle continuo</div><div class="exdet">5' corsa leggera con stick in mano, cradle costante. Sia mano dominante che non.</div></div></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Shadow throwing — analisi gesto</div><div class="exdet">5' davanti al telefono (registrati). Osserva: punto di rilascio, posizione dei piedi, follow-through del braccio.</div></div></div>
+
+      <div class="sec-lbl">Wall ball — 30'</div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Passaggi overhand veloci</div><div class="exdet">5' mano dominante · distanza 3–5m. Focus: snap del polso, rilascia DAVANTI alla testa, non di lato.</div></div><span class="extag tag-tech">Mano dom.</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Mano non dominante — lenta</div><div class="exdet">5' solo mano debole · 3m dalla parete. Qualità assoluta, non velocità. Il cervello impara dal pattern corretto.</div></div><span class="extag tag-tech">Non-dom.</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Passaggi sidearm</div><div class="exdet">3' per mano · tiro laterale basso. Utile nel traffico, colpi rasi sotto al difensore.</div></div><span class="extag tag-tech">Sidearm</span></div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Catch difficili (out-of-body)</div><div class="exdet">5' · lancia a angolo contro il muro, prendi come capita. Allena reattività delle mani e adattamento.</div></div><span class="extag tag-tech">Reattività</span></div>
+
+      <div class="sec-lbl">Tiro in movimento — 20'</div>
+      <div class="ex"><div class="exn">7</div><div class="exc"><div class="exname">Corsa → tiro in corsa (dodging shot)</div><div class="exdet">10 per lato · 3 passi di avvicinamento + tiro. Focus: equilibrio, non potenza. Piede opposto avanzato nel tiro.</div></div><span class="extag tag-tech">Tiro</span></div>
+      <div class="ex"><div class="exn">8</div><div class="exc"><div class="exname">Roll dodge + tiro</div><div class="exdet">8 per lato · pivot su piede interno, rotazione, 1 passo, tiro. Il fondamentale base dell'attacco.</div></div><span class="extag tag-tech">Dodge</span></div>
+
+      <div class="sec-lbl">Cooldown — 10'</div>
+      <div class="ex"><div class="exn">9</div><div class="exc"><div class="exname">Stretching spalla + cradle lento</div><div class="exdet">Cross-body 40" × 3 per lato + 3' cradle rilassato</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ FASE 2 ████ -->
+<div class="phase" id="ph1">
+  <div class="pbanner p2">
+    <div class="pb-phase">Fase 2 · Settimane 3–4</div>
+    <div class="pb-title">Sviluppo &amp; Intensità</div>
+    <div class="pb-desc">Il fiato inizia a venire. Allunga la Z2 a <strong>35–40'</strong>. Aumenta le ripetizioni di sprint. Introduci varianti di forza più difficili: <strong>archer push-up, bulgari con zaino, box jump</strong>. Wall ball a distanza maggiore. Il tiro deve avere più corpo dietro.</div>
+  </div>
+
+  <div class="prog-block">
+    <div class="prog-top">
+      <span class="prog-label">Progressi</span>
+      <span class="prog-pct" id="pct1">0%</span>
+    </div>
+    <div class="prog-dots" id="dots1">
+      <div class="pd cur" onclick="dot(1,0)">Lun</div>
+      <div class="pd" onclick="dot(1,1)">Mar</div>
+      <div class="pd" onclick="dot(1,2)">Mer</div>
+      <div class="pd" onclick="dot(1,3)">Gio</div>
+      <div class="pd" onclick="dot(1,4)">Ven</div>
+      <div class="pd" onclick="dot(1,5)">Sab</div>
+      <div class="pd" onclick="dot(1,6)">Dom</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="fill1" style="width:0%"></div></div>
+  </div>
+
+  <div class="dcard" id="c1-0">
+    <div class="dcard-hdr" onclick="tog('c1-0')">
+      <div class="dcard-left"><div class="dday run-day">Lun</div><div><div class="dtitle">Corsa Z2 allungata + Core avanzato</div><div class="dtype">35–40' · Ab wheel · 60 min</div></div></div>
+      <div class="dmeta"><span class="dur">60'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Corsa — 35–40'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Corsa Z2 allungata</div><div class="exdet">35–40' continui. Stesso ritmo settimane 1–2. L'obiettivo è la durata, non la velocità. Ogni 5' respira esclusivamente col naso per 30" per controllare l'intensità.</div></div><span class="extag tag-run">Z2</span></div>
+      <div class="sec-lbl">Core avanzato — 15'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Plank tap spalla</div><div class="exdet">3 × 10 tap per lato · senza ruotare i fianchi. Più difficile del plank statico.</div></div><span class="extag tag-core">Core</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Ab wheel rollout (o strisciata su superficie)</div><div class="exdet">3 × 6 · estendi lento, torna con il core NON con la schiena. Se non hai la ruota: usa un asciugamano su parquet.</div></div><span class="extag tag-core">Core</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Hollow body rock</div><div class="exdet">3 × 15 oscillazioni · mantieni la tensione, no rilassamento tra le ripetizioni</div></div><span class="extag tag-core">Core</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c1-1">
+    <div class="dcard-hdr" onclick="tog('c1-1')">
+      <div class="dcard-left"><div class="dday str-day">Mar</div><div><div class="dtitle">Forza upper avanzata + Potenza tiro</div><div class="dtype">Archer push-up · Trazioni · 65 min</div></div></div>
+      <div class="dmeta"><span class="dur">65'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Forza upper avanzata — 35'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Archer push-up</div><div class="exdet">4 × 6 per lato · un braccio esteso lateralmente, spingi con l'altro. Progressione naturale dal push-up standard. Se troppo difficile, torna al push-up largo.</div></div><span class="extag tag-str">Petto</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Pike push-up profondo</div><div class="exdet">4 × 10 · corpo a V invertita, testa verso terra. Fondamentale per la potenza del tiro sovraccapo.</div></div><span class="extag tag-str">Spalle</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Dip profondo su panchine</div><div class="exdet">3 × 12 · gomiti scendono a 90°. Aggiunta vs sett 1–2: più profondità, non più peso.</div></div><span class="extag tag-str">Tricipiti</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Trazioni australiane (su panchina)</div><div class="exdet">3 × 10 · corpo inclinato, tira il petto alla panca. Attiva i dorsali che tirano lo stick in cradle e nel passaggio.</div></div><span class="extag tag-str">Dorsali</span></div>
+      <div class="sec-lbl">Potenza tiro — 25'</div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Tiro esplosivo da fermo (max distanza)</div><div class="exdet">15 per lato · massima potenza. Usa tutto il corpo: anca → busto → spalla → polso. Distanza maggiore rispetto alle prime 2 settimane.</div></div><span class="extag tag-tech">Potenza</span></div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Passaggi mano non-dom — 10'</div><div class="exdet">Solo mano debole. 4m di distanza. Qualità assoluta. Annota mentalmente cosa migliora ogni sessione.</div></div><span class="extag tag-tech">Debolezze</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c1-2">
+    <div class="dcard-hdr" onclick="tog('c1-2')">
+      <div class="dcard-left"><div class="dday mix-day">Mer</div><div><div class="dtitle">Intervalli 200m + Agilità specifica</div><div class="dtype">Zona lattacida · 55 min</div></div></div>
+      <div class="dmeta"><span class="dur">55'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Intervalli — 25'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">200m ripetute (o 30'' sprint)</div><div class="exdet">6 × 200m con 90'' recupero al 85–90% max. Se non hai 200m, usa 30'' sprint + 90'' recupero. Respiro pesante ma regolare = zona giusta.</div></div><span class="extag tag-run">Lattacida</span></div>
+      <div class="tip"><strong>Perché 200m?</strong> Mima la durata degli sforzi reali in partita (20–40''). Allena sia la potenza che la resistenza alla velocità. Sett 3–4: 6 rip. Sett 5–6: 8 rip.</div>
+      <div class="sec-lbl">Agilità specifica lacrosse — 25'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">L-drill (NFL agility drill)</div><div class="exdet">5 × · coni a L: 5m avanti, giro serrato, 5m, giro, diagonale 7m. Recupero 60"</div></div><span class="extag tag-mix">Agilità</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">5-10-5 con stick in mano</div><div class="exdet">4 × · esegui il 5-10-5 standard ma con lo stick in cradle. Integra la gestione della palla nei cambi direzione.</div></div><span class="extag tag-mix">Specifica</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Box drill (4 coni)</div><div class="exdet">4 × · quadrato 5×5m: corri avanti, laterale destra, indietro, laterale sinistra. 2 giri di fila. Recupero 60".</div></div><span class="extag tag-mix">Coord.</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c1-3">
+    <div class="dcard-hdr" onclick="tog('c1-3')">
+      <div class="dcard-left"><div class="dday str-day">Gio</div><div><div class="dtitle">Gambe avanzate + Pliometria</div><div class="dtype">Zaino 5–8 kg · Box jump · 60 min</div></div></div>
+      <div class="dmeta"><span class="dur">60'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Forza gambe con carico — 35'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Squat con zaino (5–8 kg)</div><div class="exdet">4 × 12 · progressione dal corpo libero. Stessa tecnica: 3" giù, 1" pausa, esplosivo su.</div></div><span class="extag tag-str">Quad.</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Bulgari con zaino</div><div class="exdet">3 × 8 per gamba · carico aumentato rispetto alle sett 1–2. Se il bilanciamento soffre, rimuovi il peso.</div></div><span class="extag tag-str">Glutei</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Step-up esplosivo su panchina</div><div class="exdet">4 × 6 per gamba · sali con una gamba esplosivamente, l'altra non aiuta. Scendi controllato. Ottimo per l'accelerazione in campo.</div></div><span class="extag tag-str">Potenza</span></div>
+      <div class="sec-lbl">Pliometria avanzata — 20'</div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Box jump su panchina</div><div class="exdet">4 × 5 · salita esplosiva sulla panchina, atterraggio morbido sulle punte (ginocchia cedono). Scendi a piedi. Pausa 90".</div></div><span class="extag tag-run">Potenza</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Alternating lunge jump</div><div class="exdet">4 × 8 totali · affondo + salto con switch in aria. Potenza esplosiva a singola gamba. Pausa 90".</div></div><span class="extag tag-run">Potenza</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c1-4">
+    <div class="dcard-hdr" onclick="tog('c1-4')">
+      <div class="dcard-left"><div class="dday run-day">Ven</div><div><div class="dtitle">Fartlek lungo + Core potenza</div><div class="dtype">40' continui · Woodchop · 55 min</div></div></div>
+      <div class="dmeta"><span class="dur">55'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Fartlek — 40'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Fartlek strutturato</div><div class="exdet">40' totali: 6' lento → 2' medio → 5' lento → 1'30'' veloce → 6' lento → 1' quasi-sprint → 5' lento → 2' medio → 12' lento. Adatta ai tuoi landmark.</div></div><span class="extag tag-run">Misto</span></div>
+      <div class="sec-lbl">Core potenza — 12'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Pallof press isometrico (elastico ad albero)</div><div class="exdet">3 × 20" per lato · braccio esteso, non ruotare. Anti-rotazione = il segreto della potenza del tiro.</div></div><span class="extag tag-core">Anti-rot.</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Woodchop diagonale (basso → alto)</div><div class="exdet">3 × 12 per lato · con pietra o borraccia. Diagonale inversa rispetto al tiro: allena anche il treno opposto.</div></div><span class="extag tag-core">Obliqui</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c1-5">
+    <div class="dcard-hdr" onclick="tog('c1-5')">
+      <div class="dcard-left"><div class="dday mob-day">Sab</div><div><div class="dtitle">Mobilità avanzata</div><div class="dtype">CARs + Toracico · 45 min</div></div></div>
+      <div class="dmeta"><span class="dur">45'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Protocollo mobilità avanzato — 45'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Tutto il protocollo sabato sett 1–2</div><div class="exdet">Cat-cow, world's greatest, spiderman, book opener, flessori anca, ischio, cross-body. Stesso ordine.</div></div></div>
+      <div class="ex"><div class="exn">+</div><div class="exc"><div class="exname">Shoulder CARs (Controlled Articular Rotations)</div><div class="exdet">10 rotazioni lentissime per spalla · massimo range, nessuna compensazione del busto. Salute articolare a lungo termine.</div></div><span class="extag tag-mob">Spalla</span></div>
+      <div class="ex"><div class="exn">+</div><div class="exc"><div class="exname">Rotazione toracica in quadrupedia</div><div class="exdet">10 per lato · in posizione gatto, porta un gomito verso il soffitto aprendo la schiena</div></div><span class="extag tag-mob">Torace</span></div>
+      <div class="ex"><div class="exn">+</div><div class="exc"><div class="exname">Couch stretch psoas</div><div class="exdet">60" per lato · tallone verso il gluteo, anca spinta avanti. Apre i flessori che si accorciano correndo.</div></div><span class="extag tag-mob">Anca</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c1-6">
+    <div class="dcard-hdr" onclick="tog('c1-6')">
+      <div class="dcard-left"><div class="dday tech-day">Dom</div><div><div class="dtitle">Tecnica avanzata + Scenario</div><div class="dtype">Skills day · 80 min</div></div></div>
+      <div class="dmeta"><span class="dur">80'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Wall ball intensivo — 30'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Passaggi rapidi metronomizzati</div><div class="exdet">5' mano dominante · 1 passaggio ogni 2 secondi (usa un metronomo app). Distanza 6–8m. Aumenta la distanza vs sett 1–2.</div></div><span class="extag tag-tech">Velocità</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">One-handed catch & release</div><div class="exdet">5' per mano · prendi e rilascia con una sola mano. Agilità delle dita e coordinazione.</div></div><span class="extag tag-tech">Mani</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Passaggi in movimento (laterale)</div><div class="exdet">Muoviti lateralmente mentre fai wall ball. 3' per lato. Mima la situazione di gioco reale.</div></div><span class="extag tag-tech">Game-like</span></div>
+      <div class="sec-lbl">Scenario simulato — 30'</div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Dodge & shoot sequence</div><div class="exdet">10 rip · corsa → roll dodge → 2 passi → tiro. Simula l'attacco dal bordo crease. Entrambi i lati.</div></div><span class="extag tag-tech">Game-like</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Catch sotto pressione simulata</div><div class="exdet">Lancia contro muro, fai 3 passi veloci laterali, ricevi il rimbalzo. Reattività in movimento.</div></div><span class="extag tag-tech">Reattività</span></div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">BTB (Behind The Back) intro</div><div class="exdet">10 tentativi · solo se la mano non-dominante è migliorata. Non forzare: tecnica sbagliata crea cattive abitudini.</div></div><span class="extag tag-tech">Avanzato</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ FASE 3 ████ -->
+<div class="phase" id="ph2">
+  <div class="pbanner p3">
+    <div class="pb-phase">Fase 3 · Settimane 5–6</div>
+    <div class="pb-title">Picco &amp; Specificità</div>
+    <div class="pb-desc">Massimo volume. Z2 a <strong>45'</strong>. Sprint a 8 rip. Introduci la <strong>pliometria mono-gamba</strong> (single-leg box jump, pistol squat assistito). Forza: vicino al limite del corpo libero. Tecnica domenica si avvicina al gioco reale: <strong>pattern 1v1, dodging complessi</strong>.</div>
+  </div>
+
+  <div class="prog-block">
+    <div class="prog-top">
+      <span class="prog-label">Progressi</span>
+      <span class="prog-pct" id="pct2">0%</span>
+    </div>
+    <div class="prog-dots" id="dots2">
+      <div class="pd cur" onclick="dot(2,0)">Lun</div>
+      <div class="pd" onclick="dot(2,1)">Mar</div>
+      <div class="pd" onclick="dot(2,2)">Mer</div>
+      <div class="pd" onclick="dot(2,3)">Gio</div>
+      <div class="pd" onclick="dot(2,4)">Ven</div>
+      <div class="pd" onclick="dot(2,5)">Sab</div>
+      <div class="pd" onclick="dot(2,6)">Dom</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="fill2" style="width:0%"></div></div>
+  </div>
+
+  <div class="dcard" id="c2-0">
+    <div class="dcard-hdr" onclick="tog('c2-0')">
+      <div class="dcard-left"><div class="dday run-day">Lun</div><div><div class="dtitle">Corsa Z2 45' + Core picco</div><div class="dtype">Volume massimo · 65 min</div></div></div>
+      <div class="dmeta"><span class="dur">65'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Corsa Z2 — 45'</div><div class="exdet">45' continui. Stesso ritmo conversazionale. Se sei in forma, prova a mantenere il naso per 60'' ogni 5'. Segnale di buon aerobico sviluppato.</div></div><span class="extag tag-run">Z2</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Core circuito × 3 giri</div><div class="exdet">Plank 45'' → Dead bug × 10 → Hollow rock × 20 → Pallof press 20''. Pausa 60'' tra giri.</div></div><span class="extag tag-core">Circuito</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c2-1">
+    <div class="dcard-hdr" onclick="tog('c2-1')">
+      <div class="dcard-left"><div class="dday str-day">Mar</div><div><div class="dtitle">Upper body picco + Tiro max potenza</div><div class="dtype">Massima intensità · 70 min</div></div></div>
+      <div class="dmeta"><span class="dur">70'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Forza upper picco — 40'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Pseudo planche push-up</div><div class="exdet">4 × 5 · mani all'altezza dell'ombelico, dita verso i piedi, inclinati in avanti. Massima difficoltà push-up. Solo se l'archer push-up è consolidato.</div></div><span class="extag tag-str">Avanzato</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Pike push-up + pausa in basso</div><div class="exdet">4 × 8 · 2'' pausa a testa quasi a terra. Aumenta il time under tension nelle spalle.</div></div><span class="extag tag-str">Spalle</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Dip lento (3" su, 3" giù)</div><div class="exdet">3 × 8 · movimento controllato per massimizzare il reclutamento muscolare</div></div><span class="extag tag-str">Tricipiti</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Trazioni australiane — piedi elevati</div><div class="exdet">3 × 12 · piedi su panchina, corpo quasi orizzontale. Difficoltà massima per questa variante.</div></div><span class="extag tag-str">Dorsali</span></div>
+      <div class="sec-lbl">Potenza tiro max — 25'</div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Tiro esplosivo sequenza 5</div><div class="exdet">5 tiri consecutivi il più potenti possibile, poi 90'' recupero × 4 serie. Testa il limite della tua potenza.</div></div><span class="extag tag-tech">Max potenza</span></div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Tiro in affaticamento</div><div class="exdet">Dopo 5' di corsa leggera: 10 tiri per lato. Allena il tiro quando sei sotto stress fisico — come in partita.</div></div><span class="extag tag-tech">Fatica</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c2-2">
+    <div class="dcard-hdr" onclick="tog('c2-2')">
+      <div class="dcard-left"><div class="dday mix-day">Mer</div><div><div class="dtitle">Sprint 8 rip + Agilità lacrosse</div><div class="dtype">Volume picco · 60 min</div></div></div>
+      <div class="dmeta"><span class="dur">60'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Sprint — 28'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">200m ripetute × 8 (o 30'' sprint × 8)</div><div class="exdet">8 ripetizioni con 90'' recupero. Mantieni il ritmo costante: la rep 8 deve essere uguale alla rep 1. Se crolli, fermati a 6.</div></div><span class="extag tag-run">Lattacida</span></div>
+      <div class="sec-lbl">Agilità specifica lacrosse — 28'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Crease attack drill</div><div class="exdet">6 × · parti a 10m, sprint verso il crease (cerchio immaginario), dodge laterale, tiro. Simula l'attacco diretto alla porta.</div></div><span class="extag tag-mix">Game-like</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Defensive slide (scivolo laterale)</div><div class="exdet">4 × 10m per lato · posizione bassa difensiva, scivola lateralmente senza incrociare i piedi</div></div><span class="extag tag-mix">Difesa</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">2-step cut con cambio direzione</div><div class="exdet">6 × · corri 8m, 2 passi, taglio improvviso 90°, altri 5m. Simula il movimento di ricezione in spazio aperto.</div></div><span class="extag tag-mix">Taglio</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c2-3">
+    <div class="dcard-hdr" onclick="tog('c2-3')">
+      <div class="dcard-left"><div class="dday str-day">Gio</div><div><div class="dtitle">Gambe mono + Pliometria avanzata</div><div class="dtype">Single-leg · Pistol squat · 65 min</div></div></div>
+      <div class="dmeta"><span class="dur">65'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Forza mono-gamba — 35'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Pistol squat assistito (tenendo palo/albero)</div><div class="exdet">3 × 5 per gamba · scendi su una gamba il più possibile, aiutati con una mano. Progressione chiave per lacrosse.</div></div><span class="extag tag-str">Mono-gamba</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Bulgari con zaino pesante (8–10 kg)</div><div class="exdet">3 × 8 per gamba · massimo carico raggiunto durante il piano</div></div><span class="extag tag-str">Glutei</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Single-leg deadlift (senza peso)</div><div class="exdet">3 × 10 per gamba · bilancia una gamba dietro, inclina il busto, ritorna. Propriocezione e ischio-glutei.</div></div><span class="extag tag-str">Equilibrio</span></div>
+      <div class="sec-lbl">Pliometria mono-gamba — 25'</div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Single-leg box jump</div><div class="exdet">4 × 4 per gamba · salta su panchina con una sola gamba. Atterraggio morbido, ginocchio stabile. Pausa 90".</div></div><span class="extag tag-run">Potenza</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Bounding (passi giganti esplosivi)</div><div class="exdet">4 × 20m · corsa con passi enormi, massima potenza per passo. Come un triplo salto continuo.</div></div><span class="extag tag-run">Potenza</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c2-4">
+    <div class="dcard-hdr" onclick="tog('c2-4')">
+      <div class="dcard-left"><div class="dday run-day">Ven</div><div><div class="dtitle">Fartlek 45' + Core integrato</div><div class="dtype">Volume massimo · 60 min</div></div></div>
+      <div class="dmeta"><span class="dur">60'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Fartlek 45' con picchi più lunghi</div><div class="exdet">45' totali: segmenti veloci ora 2–3' invece di 1'. Es: 6' lento → 2'30'' medio-fast → 6' lento → 2' quasi-sprint → 6' lento → 3' medio → resto lento. Senti la progressione delle ultime settimane.</div></div><span class="extag tag-run">Misto</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Core superset × 3 (post-corsa)</div><div class="exdet">Pallof press 20'' + Woodchop × 12 + Russian twist × 20. Pausa 60'' tra superset. 12' totali.</div></div><span class="extag tag-core">Superset</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c2-5">
+    <div class="dcard-hdr" onclick="tog('c2-5')">
+      <div class="dcard-left"><div class="dday mob-day">Sab</div><div><div class="dtitle">Recupero attivo completo</div><div class="dtype">Settimana di picco = riposo qualità · 40 min</div></div></div>
+      <div class="dmeta"><span class="dur">40'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Priorità: qualità del recupero</div>
+      <div class="ex"><div class="exn">!</div><div class="exc"><div class="exname">Stesso protocollo sabato fasi 1–2</div><div class="exdet">In settimane di alto volume (5–6), il sabato è sacro. Non aggiungere nulla. Se sei molto stanco, dimezza i tempi degli stretch e aggiungi 10' di respirazione diaframmatica.</div></div></div>
+      <div class="ex"><div class="exn">+</div><div class="exc"><div class="exname">Respirazione diaframmatica — 5'</div><div class="exdet">Sdraiato, mano sulla pancia: inspira 4'', pancia gonfia, espira 6''. Abbassa il cortisolo e accelera il recupero.</div></div><span class="extag tag-mob">Recovery</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c2-6">
+    <div class="dcard-hdr" onclick="tog('c2-6')">
+      <div class="dcard-left"><div class="dday tech-day">Dom</div><div><div class="dtitle">Tecnica 1v1 + Pattern attacco</div><div class="dtype">Game simulation · 85 min</div></div></div>
+      <div class="dmeta"><span class="dur">85'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Wall ball intenso — 25'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Passaggi a ritmo sostenuto</div><div class="exdet">Tutte le varianti in sequenza: overhand dom 3' → non-dom 3' → sidearm 2' per mano → out-of-body 5'. Nessuna pausa lunga tra varianti.</div></div><span class="extag tag-tech">Completo</span></div>
+      <div class="sec-lbl">Pattern attacco simulato — 35'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Pick & roll simulato</div><div class="exdet">Corri verso un punto immaginario (pick), gira su te stesso 90°, passo, tiro. 10 rip per lato.</div></div><span class="extag tag-tech">Attacco</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Feed simulato — ricevi + tiro immediato</div><div class="exdet">Tira su una parete laterale, corri 3m, ricevi il rimbalzo in corsa, tira. Simula la ricezione da un feeder.</div></div><span class="extag tag-tech">Ricezione</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">BTB + sidearm combo</div><div class="exdet">Se il BTB è nel tuo kit: 5 BTB + 5 sidearm. Alternali in sequenza. Ampliamento del repertorio.</div></div><span class="extag tag-tech">Repertorio</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Tiro in fatica simulata</div><div class="exdet">2' di shuttle run → 8 tiri esplosivi × 3 serie. Questa è la vera condizione di partita: fiato corto, devi comunque tirare bene.</div></div><span class="extag tag-tech">Fatica</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ FASE 4 ████ -->
+<div class="phase" id="ph3">
+  <div class="pbanner p4">
+    <div class="pb-phase">Fase 4 · Settimane 7–8</div>
+    <div class="pb-title">Affilatura &amp; Gara</div>
+    <div class="pb-desc"><strong>Riduci il volume del 20–30%</strong>, mantieni l'intensità. Il corpo consolida le adattazioni. Taper: meno volume, stessa velocità. Domenica: sessione tecnica che simula una partita reale. Arriverai alla stagione <strong>più veloce, più forte, con più fiato</strong>.</div>
+  </div>
+
+  <div class="prog-block">
+    <div class="prog-top">
+      <span class="prog-label">Progressi</span>
+      <span class="prog-pct" id="pct3">0%</span>
+    </div>
+    <div class="prog-dots" id="dots3">
+      <div class="pd cur" onclick="dot(3,0)">Lun</div>
+      <div class="pd" onclick="dot(3,1)">Mar</div>
+      <div class="pd" onclick="dot(3,2)">Mer</div>
+      <div class="pd" onclick="dot(3,3)">Gio</div>
+      <div class="pd" onclick="dot(3,4)">Ven</div>
+      <div class="pd" onclick="dot(3,5)">Sab</div>
+      <div class="pd" onclick="dot(3,6)">Dom</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="fill3" style="width:0%"></div></div>
+  </div>
+
+  <div class="dcard" id="c3-0">
+    <div class="dcard-hdr" onclick="tog('c3-0')">
+      <div class="dcard-left"><div class="dday run-day">Lun</div><div><div class="dtitle">Corsa Z2 ridotta + Core mantenimento</div><div class="dtype">Taper · 35–40 min · 50 min</div></div></div>
+      <div class="dmeta"><span class="dur">50'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Corsa Z2 — 35–40' (taper)</div><div class="exdet">Meno volume, stessa intensità. Non correre lento "per riposare" — il ritmo Z2 resta uguale, accorci solo la durata. È qui che si "incassa" il guadagno delle settimane precedenti.</div></div><span class="extag tag-run">Taper</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Core circuito breve × 2 giri</div><div class="exdet">Dead bug × 8 → Hollow hold 30'' → Side plank 20'' per lato. Solo mantenimento.</div></div><span class="extag tag-core">Mantenimento</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c3-1">
+    <div class="dcard-hdr" onclick="tog('c3-1')">
+      <div class="dcard-left"><div class="dday str-day">Mar</div><div><div class="dtitle">Forza qualità — volume ridotto</div><div class="dtype">Stessa intensità, meno serie · 55 min</div></div></div>
+      <div class="dmeta"><span class="dur">55'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="tip"><strong>Principio taper:</strong> Riduci le serie del 25–30% ma mantieni l'intensità (lo stesso peso, la stessa difficoltà). Il volume scende, la qualità no.</div>
+      <div class="sec-lbl">Forza upper — 25'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Archer push-up o pseudo planche</div><div class="exdet">3 × 5 per lato · variante più difficile che riesci a fare bene. Meno volume vs sett 5–6.</div></div><span class="extag tag-str">Petto</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Pike + Dip + Trazioni australiane</div><div class="exdet">3 × 6 ciascuno · mantenimento forza spalle, tricipiti, dorsali</div></div><span class="extag tag-str">Upper</span></div>
+      <div class="sec-lbl">Tiro qualità — 25'</div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Wall ball — tiro perfetto</div><div class="exdet">25' di wall ball a intensità media. Focus totale sulla tecnica: punto di rilascio, snap, follow-through. Prepara le mani per la stagione.</div></div><span class="extag tag-tech">Qualità</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c3-2">
+    <div class="dcard-hdr" onclick="tog('c3-2')">
+      <div class="dcard-left"><div class="dday mix-day">Mer</div><div><div class="dtitle">Sprint qualità + Agilità affilata</div><div class="dtype">Velocità mantenuta · 50 min</div></div></div>
+      <div class="dmeta"><span class="dur">50'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Sprint 10'' × 6 — qualità massima</div><div class="exdet">6 sprint al 100% (non 90%). Recupero completo tra ogni sprint (2'). In taper, ogni sprint deve essere il migliore della tua estate. Qualità &gt; quantità.</div></div><span class="extag tag-run">100%</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">T-drill + L-drill × 3 ciascuno</div><div class="exdet">Meno volume vs sett 5–6. Focus sulla nitidezza dei cambi direzione. Ogni giro deve essere preciso.</div></div><span class="extag tag-mix">Agilità</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c3-3">
+    <div class="dcard-hdr" onclick="tog('c3-3')">
+      <div class="dcard-left"><div class="dday str-day">Gio</div><div><div class="dtitle">Gambe — mantenimento esplosivo</div><div class="dtype">Bassa fatica, alta qualità · 50 min</div></div></div>
+      <div class="dmeta"><span class="dur">50'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Squat con zaino × 3 × 10</div><div class="exdet">Volume ridotto vs picco. Stesso carico.</div></div><span class="extag tag-str">Quad.</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Bulgari × 3 × 6 per gamba</div><div class="exdet">Meno rip, stessa difficoltà.</div></div><span class="extag tag-str">Glutei</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Box jump × 4 × 4</div><div class="exdet">Esplosività mantenuta. Ogni salto deve essere scattante. Questo è il banco di prova della potenza costruita in 8 settimane.</div></div><span class="extag tag-run">Potenza</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Single-leg bounding × 3 × 15m</div><div class="exdet">Meno serie vs sett 5–6. Senti la potenza per gamba che hai sviluppato.</div></div><span class="extag tag-run">Potenza</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c3-4">
+    <div class="dcard-hdr" onclick="tog('c3-4')">
+      <div class="dcard-left"><div class="dday run-day">Ven</div><div><div class="dtitle">Fartlek breve + recupero</div><div class="dtype">30' leggero · 45 min</div></div></div>
+      <div class="dmeta"><span class="dur">45'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Fartlek leggero — 30'</div><div class="exdet">30' con picchi brevi (max 1' veloce). Lascia le gambe fresche per domenica. Se sei stanco, scendi a 25' o sostituisci con camminata veloce 40'.</div></div><span class="extag tag-run">Leggero</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Stretching + respirazione — 12'</div><div class="exdet">Solo ischio, flessori anca, spalle. Nessun core aggiuntivo oggi. Risparmia energie.</div></div><span class="extag tag-mob">Recovery</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c3-5">
+    <div class="dcard-hdr" onclick="tog('c3-5')">
+      <div class="dcard-left"><div class="dday mob-day">Sab</div><div><div class="dtitle">Mobilità + Attivazione pre-stagione</div><div class="dtype">Corpo fresco per domenica · 35 min</div></div></div>
+      <div class="dmeta"><span class="dur">35'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Protocollo mobilità leggero</div><div class="exdet">World's greatest × 4 + Book opener × 8 + Couch stretch 45'' + Cross-body 40''. Nessuna intensità. Corpo fresco per la sessione tecnica di domani.</div></div><span class="extag tag-mob">Attivazione</span></div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Shoulder CARs + mobilità polso</div><div class="exdet">10 rotazioni spalla per lato + 10 cerchi polso per lato. Preparazione articolare per il tiro.</div></div><span class="extag tag-mob">Spalla</span></div>
+    </div>
+  </div>
+
+  <div class="dcard" id="c3-6">
+    <div class="dcard-hdr" onclick="tog('c3-6')">
+      <div class="dcard-left"><div class="dday tech-day">Dom</div><div><div class="dtitle">Simulazione partita</div><div class="dtype">Skills + Condizione reale · 90 min</div></div></div>
+      <div class="dmeta"><span class="dur">90'</span><span class="chevron">⌄</span></div>
+    </div>
+    <div class="dbody">
+      <div class="sec-lbl">Full warm-up con stick — 15'</div>
+      <div class="ex"><div class="exn">1</div><div class="exc"><div class="exname">Corsa con cradle + zig-zag</div><div class="exdet">5' corsa con stick, cambia direzione ogni 10m. Poi shadow throwing 5'. Poi mobilità dinamica 5'.</div></div></div>
+      <div class="sec-lbl">Sessione tecnica completa — 50'</div>
+      <div class="ex"><div class="exn">2</div><div class="exc"><div class="exname">Wall ball full — tutti i tiri</div><div class="exdet">15': overhand dom + non-dom + sidearm + out-of-body. Sequenza libera, intensità media-alta.</div></div><span class="extag tag-tech">Completo</span></div>
+      <div class="ex"><div class="exn">3</div><div class="exc"><div class="exname">Situazioni di gioco simulate</div><div class="exdet">10' · sequenze dodge+tiro, pick+roll, feed+tiro. Tutti i movimenti appresi nelle 8 settimane.</div></div><span class="extag tag-tech">Game-like</span></div>
+      <div class="ex"><div class="exn">4</div><div class="exc"><div class="exname">Tiro sotto fatica simulata</div><div class="exdet">3 × (2' shuttle run → 8 tiri esplosivi). Vedi i miglioramenti dalla fase 1. Il tiro in fatica è cambiato?</div></div><span class="extag tag-tech">Test</span></div>
+      <div class="ex"><div class="exn">5</div><div class="exc"><div class="exname">Repertorio completo libero</div><div class="exdet">15' · tira come vuoi. Sperimenta. Divertiti. Hai lavorato 8 settimane per questo.</div></div><span class="extag tag-tech">Libero</span></div>
+      <div class="sec-lbl">Cooldown finale estate — 20'</div>
+      <div class="ex"><div class="exn">6</div><div class="exc"><div class="exname">Stretching completo + riflessione</div><div class="exdet">Tutto il corpo, 8' totali. Poi 5' seduto: cosa è migliorato? Corsa? Tiro? Esplosività? Prendi nota per la prossima estate. Sei pronto per la stagione.</div></div><span class="extag tag-mob">Fine estate</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var state = [[false,false,false,false,false,false,false],[false,false,false,false,false,false,false],[false,false,false,false,false,false,false],[false,false,false,false,false,false,false]];
+var days = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+
+function dot(p,i){
+  state[p][i] = !state[p][i];
+  updateProgress(p);
+}
+function updateProgress(p){
+  var done = state[p].filter(Boolean).length;
+  var pct = Math.round(done/7*100);
+  document.getElementById('pct'+p).textContent = pct+'%';
+  document.getElementById('fill'+p).style.width = pct+'%';
+  var ds = document.getElementById('dots'+p).children;
+  for(var i=0;i<7;i++){
+    ds[i].className = 'pd';
+    if(state[p][i]) ds[i].className += ' done';
+    else if(!state[p][i] && i === state[p].indexOf(false)) ds[i].className += ' cur';
+  }
+}
+function tog(id){
+  var el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+function showPhase(n){
+  document.querySelectorAll('.phase').forEach(function(el,i){el.classList.toggle('on',i===n)});
+  document.querySelectorAll('.ptab').forEach(function(el,i){el.classList.toggle('on',i===n)});
+}
+</script>
+</body>
+</html>
